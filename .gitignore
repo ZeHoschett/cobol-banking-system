@@ -1,0 +1,8 @@
+# Saídas geradas pelo processamento
+output/*
+!output/.gitkeep
+
+# Arquivos compilados
+*.o
+*.exe
+*.so
