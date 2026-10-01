@@ -6,3 +6,6 @@ output/*
 *.o
 *.exe
 *.so
+
+# Relatório gerado na raiz ao rodar os programas
+/RELATORIO.txt
