@@ -9,3 +9,5 @@ output/*
 
 # Relatório gerado na raiz ao rodar os programas
 /RELATORIO.txt
+/CONTAS-ATUALIZADAS.dat
+/TRANSACOES-PROCESSADAS.dat
