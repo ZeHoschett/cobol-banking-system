@@ -6,8 +6,10 @@ Sistema de processamento bancário desenvolvido em COBOL, cobrindo processamento
 
 - **Fase 1 — Processamento interativo** (`CB7BANK.cob`): o operador informa o CPF, escolhe uma das contas vinculadas e executa transações pelo terminal, em loop, até optar por sair.
 - **Fase 2 — Processamento batch** (`CB7-BATCH.cob`): lê clientes, contas e transações de arquivos, aplica as regras de negócio e grava as contas atualizadas, o log de transações processadas e um relatório formatado.
+- **Fase 6 — COBOL com SQL embutido** (`CB7DBCON.cob`, `CB7DBTRS.cob`): consulta clientes por CPF e processa transações de um arquivo de entrada diretamente no banco, com `COMMIT`/`ROLLBACK`.
 - **Validações**: conta de origem e destino existentes, destino diferente da origem, valor maior que zero, saldo suficiente e estouro de capacidade dos campos numéricos (`ON SIZE ERROR`).
 - **Transferência atômica**: os dois novos saldos são calculados antes de qualquer alteração; se um dos cálculos falhar, nenhuma conta é modificada.
+- **Transferência SQL atômica**: débito, crédito e registro da transferência são executados na mesma unidade de trabalho; a operação só é aprovada depois do `COMMIT`.
 - **Tratamento de erros**: todas as operações de `OPEN`, `READ`, `WRITE` e `CLOSE` verificam o `FILE STATUS`; erros de arquivo interrompem o processamento de forma controlada.
 
 ## Estrutura do projeto
@@ -16,6 +18,8 @@ Sistema de processamento bancário desenvolvido em COBOL, cobrindo processamento
 src/
   CB7BANK.cob          Fase 1 — processamento interativo (dados em memória)
   CB7-BATCH.cob        Fase 2 — processamento batch com arquivos
+  CB7DBCON.cob         Fase 6 — consulta de cliente com SQL embutido
+  CB7DBTRS.cob         Fase 6 — processamento de transações com SQL embutido
   LER-CLIENTES.cob     Utilitário: lista os registros de CLIENTES.dat
   LER-CONTAS.cob       Utilitário: lista os registros de CONTAS.dat
   LER-TRANSACOES.cob   Utilitário: lista os registros de TRANSACOES.dat
@@ -27,6 +31,8 @@ docs/                  Documentação
 ## Requisitos
 
 - [GnuCOBOL](https://gnucobol.sourceforge.io/) 3.x (testado com 3.3-dev)
+
+Os programas `CB7DBCON.cob` e `CB7DBTRS.cob` contêm SQL embutido e **não compilam com GnuCOBOL puro**. Para pré-processá-los, é necessário um pré-processador compatível, como o do DB2 ou OCESQL, além de uma conexão configurada com o banco.
 
 ## Como compilar e executar
 
@@ -48,6 +54,13 @@ cobc -x -o CB7BANK ../src/CB7BANK.cob
 Os utilitários `LER-*` são compilados e executados da mesma forma.
 
 > No Windows, a pasta `bin` do GnuCOBOL precisa estar no `PATH` para que os executáveis encontrem a `libcob`.
+
+## SQL embutido (Fase 6)
+
+- **`CB7DBCON`** recebe um CPF e consulta `CLIENTES`, exibindo CPF, nome, e-mail e telefone. Trata `SQLCODE` igual a `0` (encontrado), `100` (não encontrado) e negativo (erro); a variável indicadora do telefone permite tratar o campo nulo.
+- **`CB7DBTRS`** lê `TRANSACOES.dat` no mesmo layout descrito abaixo e consulta as contas no banco. Tipos `1`, `2` e `3` representam depósito, saque e transferência. A agência é fixada em `0001`, pois o layout de entrada contém apenas os números das contas. Para depósito, o campo de conta origem indica a conta que recebe o valor.
+- Nas operações aprovadas, o programa atualiza o saldo e grava a operação em `TRANSACOES`; cada registro aprovado é confirmado individualmente com `COMMIT`. Operações rejeitadas fazem `ROLLBACK`. Os `UPDATE`s verificam `SQLCODE` e `SQLERRD(3)`; saques e transferências também verificam o saldo no próprio `UPDATE`.
+- O SQL usa tabelas e colunas do schema do projeto (`CLIENTES`, `CONTAS` e `TRANSACOES`). O schema disponível em `sql/schema.sql` está escrito para PostgreSQL; o SQL embutido precisa ser pré-processado e adaptado ao banco e ao pré-processador escolhido antes da execução.
 
 Saída esperada do batch com os dados de exemplo:
 
