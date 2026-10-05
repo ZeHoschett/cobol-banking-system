@@ -11,3 +11,6 @@ output/*
 /RELATORIO.txt
 /CONTAS-ATUALIZADAS.dat
 /TRANSACOES-PROCESSADAS.dat
+
+# Artefatos Maven da API
+/cb7-api/target/

@@ -26,7 +26,12 @@ src/
 data/                  Arquivos de entrada de exemplo
 output/                Arquivos gerados pelo processamento (ignorados pelo Git)
 docs/                  Documentação
+cb7-api/               API REST Spring Boot que compartilha o PostgreSQL cb7bank
 ```
+
+## API REST Spring Boot
+
+A subpasta [`cb7-api/`](./cb7-api/README.md) contém uma API Java 17+ para consultar clientes, contas e extratos e processar depósitos, saques e transferências no mesmo banco PostgreSQL `cb7bank` utilizado pelo SQL embutido do COBOL. Consulte o README da API para configuração e execução. A aplicação valida o schema existente e não executa migrações ou alterações nas tabelas.
 
 ## Requisitos
 
