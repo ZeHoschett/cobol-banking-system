@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -45,7 +46,8 @@ public class Transacao {
     @Column(nullable = false, length = 20)
     private String status;
 
-    @Column(name = "criado_em", nullable = false, insertable = false, updatable = false)
+    @CreationTimestamp
+    @Column(name = "criado_em", nullable = false)
     private OffsetDateTime criadoEm;
 
     protected Transacao() {

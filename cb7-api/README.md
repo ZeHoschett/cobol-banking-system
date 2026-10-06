@@ -17,7 +17,7 @@ $env:DB_PASSWORD = "sua-senha"
 mvn spring-boot:run
 ```
 
-Os valores padrão são URL `jdbc:postgresql://localhost:5432/cb7bank`, usuário `postgres` e senha `postgres`. Sobrescreva-os no seu ambiente. Para validar e empacotar, rode `mvn test` e `mvn package`.
+Os valores padrão são URL `jdbc:postgresql://localhost:5432/cb7bank`, usuário `postgres` e senha `postgres`. Sobrescreva-os no seu ambiente. Para validar e empacotar, rode `mvn test` e `mvn package`. Os testes automatizados usam JUnit, Spring Boot Test, MockMvc e um banco H2 em memória; não precisam de PostgreSQL e recriam os dados de teste antes de cada cenário.
 
 ## Endpoints
 
